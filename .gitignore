@@ -1,6 +1,5 @@
-bin/*
+bin
 */obj
 *.dep*
-*/Makefile
 .vscode
 build/

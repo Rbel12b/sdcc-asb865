@@ -8,3 +8,7 @@ sdas:
 
 sdld:
 	cd linksrc && $(MAKE) all
+
+install: all
+	cd asb865 && $(MAKE) install
+	cd linksrc && $(MAKE) install
