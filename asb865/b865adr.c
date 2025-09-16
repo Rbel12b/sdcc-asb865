@@ -66,6 +66,10 @@ int addr(struct expr *esp)
 
     int dlmcount = 0;
     c = get();
+    if (c != ' ' && c != '\t')
+    {
+        unget(c);
+    }
 
     while (c != '\0' && c != ';')
     {
@@ -99,8 +103,12 @@ int addr(struct expr *esp)
         expr(esp, 0);
         esp->e_mode = S_IMMED;
     }
-    else if ((c == ldlm) && iflag)
+    else if ((c == '[') && iflag)
     {
+        if((c = getnb()) != '*')
+        {
+            unget(c);
+        }
         expr(esp, 0);
         esp->e_mode = S_IND;
         if((c = get()) != rdlm)
@@ -126,8 +134,12 @@ int addr(struct expr *esp)
             }
         }
     }
-    else if ((c == ldlm) && (c != '*'))
+    else if (c == '[')
     {
+        if((c = getnb()) != '*')
+        {
+            unget(c);
+        }
         expr(esp, 0);
         esp->e_mode = S_IND;
         if((c = get()) != rdlm)
@@ -159,27 +171,61 @@ int addr(struct expr *esp)
         {
             unget(c);
         }
-        if((c = get()) != ldlm)
+        if (c == '(' && get() && admode(regs) == S_SP)
         {
-            unget(c);
-        }
-        expr(esp, 0);
-        esp->e_mode = S_ABS;
-        if (more())
-        {
-            if(comma(0))
+            while (more() && (c = getnb()) != ',' && c != '+');
+            if (c == ',')
             {
                 switch (admode(regs))
                 {
                 case S_X:
-                    esp->e_mode = S_ABSX;
+                    esp->e_mode = S_SP_X;
                     break;
                 case S_Y:
-                    esp->e_mode = S_ABSY;
+                    esp->e_mode = S_SP_Y;
                     break;
                 default:
                     aerr();
                     break;
+                }
+            }
+            else if (c == '+')
+            {
+                if ((c = getnb()) == '#')
+                {
+                    expr(esp, 0);
+                    esp->e_mode = S_SP_IMM;
+                }
+                else
+                {
+                    aerr();
+                }
+            }
+        }
+        else
+        {
+            if (c == '(')
+            {
+                unget(c);
+            }
+            expr(esp, 0);
+            esp->e_mode = S_ABS;
+            if (more())
+            {
+                if(comma(0))
+                {
+                    switch (admode(regs))
+                    {
+                    case S_X:
+                        esp->e_mode = S_ABSX;
+                        break;
+                    case S_Y:
+                        esp->e_mode = S_ABSY;
+                        break;
+                    default:
+                        aerr();
+                        break;
+                    }
                 }
             }
         }

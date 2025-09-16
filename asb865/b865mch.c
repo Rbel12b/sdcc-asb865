@@ -9,6 +9,11 @@ struct area *zpg;
 
 VOID outAddr(struct expr* exp, int mode)
 {
+	if (mode == S_REG || mode == S_SP_X || mode == S_SP_Y)
+	{
+		return;
+	}
+
 	if(mode >= S_ABS && mode <= S_ABSY)
 	{
 		outrw(exp, 0);
@@ -41,20 +46,10 @@ VOID machine(struct mne *mp)
 			aerr();
 			break;
 		}
-		if(v1 == v2)
+		if(v1 == v2 && v1 == S_REG)
 		{
-			if(v1 == S_REG)
-			{
-				outab(1 | (e2.e_addr << 5));
-				outab(e1.e_addr); // reverse order e2: source, e1: destination
-			}
-			else
-			{
-				outab(3);
-				outab((v2 - S_ABS) | ((v1 - S_ABS) << 4));
-				outAddr(&e1, v1);
-				outAddr(&e2, v2);
-			}
+			outab(1 | (e2.e_addr << 5));
+			outab(e1.e_addr); // reverse order e2: source, e1: destination
 		}
 		else if(v1 == S_REG)
 		{
@@ -62,11 +57,18 @@ VOID machine(struct mne *mp)
 			outab(v2 - S_ABS);
 			outAddr(&e2, v2);
 		}
-		else
+		else if(v2 == S_REG)
 		{
 			outab(4 | (e2.e_addr << 5));
 			outab(v1 - S_ABS);
 			outAddr(&e1, v1);
+		}
+		else
+		{
+			outab(3);
+			outab((v2 - S_ABS) | ((v1 - S_ABS) << 4));
+			outAddr(&e1, v1);
+			outAddr(&e2, v2);
 		}
 		break;
 

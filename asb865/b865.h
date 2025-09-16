@@ -28,7 +28,11 @@ struct adsym
 #define S_INDX 44
 #define S_INDY 45
 #define S_IND 46
-#define S_REG 47
+// #define S_ill 47
+#define S_SP_IMM 48
+#define S_SP_X 49
+#define S_SP_Y 50
+#define S_REG 51
 
 #define S_2ROP 50
 #define S_1ROP 51
