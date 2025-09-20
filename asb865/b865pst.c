@@ -142,6 +142,11 @@ struct mne mne[] = {
 
     {NULL, ".b865", S_B865, 0, 0},
 
+
+/* sdas specific */
+    {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
+/* end sdas specific */
+
     /* b865 Instructions */
 
     {NULL, "adc", S_ADD, 0, 0x18},
